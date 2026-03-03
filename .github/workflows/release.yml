@@ -1,0 +1,46 @@
+name: Build and Release Addon
+
+on:
+  push:
+    branches: [ "main" ]
+    paths:
+      - "SirusMythicTooltip/**"
+      - "VERSION"
+      - ".github/workflows/release.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build_release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Read version
+        id: ver
+        run: |
+          if [ ! -f VERSION ]; then echo "0.0.1" > VERSION; fi
+          VERSION="$(cat VERSION | tr -d '\r\n ')"
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+
+      - name: Build zip
+        run: |
+          cd SirusMythicTooltip
+          zip -r ../SirusMythicTooltip.zip . -x "*.pyc" "__pycache__/*"
+          cd ..
+          ls -la
+
+      - name: Create/Update Release (tag = vVERSION)
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v${{ steps.ver.outputs.version }}
+          name: SirusMythicTooltip v${{ steps.ver.outputs.version }}
+          draft: false
+          prerelease: false
+          files: |
+            SirusMythicTooltip.zip
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
