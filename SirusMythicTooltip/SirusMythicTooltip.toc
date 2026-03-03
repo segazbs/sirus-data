@@ -1,0 +1,8 @@
+## Interface: 30300
+## Title: Sirus Mythic Tooltip
+## Notes: Shows Mythic+ score and best key from Sirus ladder in tooltips
+## Author: You
+## Version: 1.0.0
+
+Data.lua
+SirusMythicTooltip.lua
